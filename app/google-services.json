@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "268291098399",
+    "project_id": "siskamling-app",
+    "storage_bucket": "siskamling-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:268291098399:android:bfcd7423a0524a61db122a",
+        "android_client_info": {
+          "package_name": "com.fayyad.siskamlingapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBd5xwMR2x20XMsLKVexBNDqiw6zaqCgtI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
