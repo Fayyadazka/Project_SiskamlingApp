@@ -64,4 +64,9 @@ class ReportViewModel @Inject constructor(
             _actionStatus.value = Pair(isSuccess, message)
         }
     }
+    fun syncApiData(url: String) {
+        repository.syncDataFromApi(url) { isSuccess, message ->
+            _actionStatus.value = Pair(isSuccess, message)
+        }
+    }
 }

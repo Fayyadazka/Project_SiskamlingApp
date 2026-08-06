@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.fayyad.siskamlingapp.data.ImgbbApi
 import com.fayyad.siskamlingapp.data.ImgbbResponse
+import com.fayyad.siskamlingapp.data.OpenDataApi
 import com.fayyad.siskamlingapp.data.ReportModel
 import com.google.firebase.database.DatabaseReference
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -100,6 +101,38 @@ class ReportRepository @Inject constructor(
         dbReference.child(id).removeValue()
             .addOnSuccessListener { onResult(true, "Laporan berhasil dihapus!") }
             .addOnFailureListener { onResult(false, it.message ?: "Gagal menghapus laporan") }
+    }
+    // Menarik Data dari API Eksternal lalu Push ke Firebase
+    fun syncDataFromApi(apiUrl: String, onResult: (Boolean, String) -> Unit) {
+        val retrofit = retrofit2.Retrofit.Builder()
+            .baseUrl("https://run.mocky.io/")
+            .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
+            .build()
+
+
+        val api = retrofit.create(OpenDataApi::class.java)
+
+        api.getInitialData(apiUrl).enqueue(object : retrofit2.Callback<List<ReportModel>> {
+            override fun onResponse(call: retrofit2.Call<List<ReportModel>>, response: retrofit2.Response<List<ReportModel>>) {
+                if (response.isSuccessful && response.body() != null) {
+                    val listData = response.body()!!
+
+                    // Looping data dari API dan masukkan ke Firebase
+                    for (report in listData) {
+                        val newId = dbReference.push().key ?: continue
+                        report.id = newId // Berikan ID unik Firebase
+                        dbReference.child(newId).setValue(report)
+                    }
+                    onResult(true, "Berhasil! ${listData.size} Data Awal API disinkronisasi ke Firebase.")
+                } else {
+                    onResult(false, "Gagal mengambil data dari Server API.")
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<List<ReportModel>>, t: Throwable) {
+                onResult(false, "Error Jaringan: ${t.message}")
+            }
+        })
     }
 
 }

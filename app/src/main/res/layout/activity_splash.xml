@@ -4,33 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#B71C1C"> <!-- Warna Merah Khas Siskamling -->
+    android:background="#FFFFFF"> <!-- Background Putih Bersih -->
 
-    <!-- Ikon Keamanan Bawaan Android -->
+    <!-- Menampilkan Logo Baru Anda -->
     <ImageView
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:src="@android:drawable/ic_secure"
-        app:tint="#FFFFFF"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_marginBottom="24dp"/>
-
-    <!-- Judul Aplikasi -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SISKAMLING APP"
-        android:textColor="#FFFFFF"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.05"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Keamanan Lingkungan Terpadu"
-        android:textColor="#FFCDD2"
-        android:textSize="16sp"/>
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@drawable/logo"
+        android:scaleType="fitCenter"/>
 
 </LinearLayout>
