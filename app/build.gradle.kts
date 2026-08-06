@@ -54,8 +54,15 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.database)
+    implementation(libs.firebase.storage)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // RETROFIT (Untuk API Pihak Ketiga)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }

@@ -1,7 +1,7 @@
+// Tanggal Pengerjaan: 2 Agustus 2026
 // NIM: 10121054
 // Nama: Fayyad Azka Muhammad
 // Kelas: IF12K
-// TUGAS BESAR UAS PEMROGRAMAN ANDROID
 
 package com.fayyad.siskamlingapp
 

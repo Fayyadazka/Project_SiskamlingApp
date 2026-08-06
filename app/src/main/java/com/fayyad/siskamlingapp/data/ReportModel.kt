@@ -5,6 +5,6 @@ data class ReportModel(
     val titikRawan: String = "",
     val jadwalRonda: String = "",
     val kategoriKejadian: String = "",
-    val fotoKejadian: String = "", // Menyimpan URL gambar dari Firebase Storage
+    val fotoKejadian: String = "", // Menyimpan URL gambar dari Storage
     val statusVerifikasiRw: String = "Belum Diverifikasi"
 )
