@@ -87,9 +87,9 @@
                 android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Dropdown Jadwal Ronda -->
+        <!-- Input Kalender Tanggal Ronda (BARU) -->
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
@@ -97,12 +97,16 @@
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusBottomEnd="12dp"
-            android:hint="Jadwal Ronda Terkait">
+            app:endIconMode="custom"
+            app:endIconDrawable="@android:drawable/ic_menu_my_calendar"
+            android:hint="Tanggal Pemantauan / Ronda">
 
-            <AutoCompleteTextView
-                android:id="@+id/spinJadwal"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtTanggalRonda"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusable="false"
+                android:cursorVisible="false"
                 android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -117,6 +121,7 @@
             app:cornerRadius="12dp"
             android:backgroundTint="#B71C1C"/>
 
+        <!-- Tombol Lihat Data -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLihatData"
             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -126,5 +131,4 @@
             android:textColor="#1976D2"
             android:layout_marginTop="8dp"/>
     </LinearLayout>
-
 </ScrollView>

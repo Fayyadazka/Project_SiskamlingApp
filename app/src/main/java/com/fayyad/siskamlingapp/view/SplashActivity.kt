@@ -19,10 +19,9 @@ class SplashActivity : AppCompatActivity() {
 
         // Menahan layar selama 2000 milidetik (2 detik)
         Handler(Looper.getMainLooper()).postDelayed({
-            // Berpindah ke MainActivity setelah 2 detik
-            val intent = Intent(this, MainActivity::class.java)
+            // UBAH BARIS INI: Berpindah ke HomeActivity, bukan MainActivity
+            val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
-            // Tutup SplashActivity agar pengguna tidak bisa kembali ke layar ini saat menekan tombol "Back"
             finish()
         }, 2000)
     }
