@@ -1,9 +1,12 @@
 package com.fayyad.siskamlingapp.data
 
+import com.google.gson.annotations.SerializedName
+
 data class ImgbbResponse(
-    val data: ImgbbData?
+    @SerializedName("data") val data: ImgbbData?
 )
 
 data class ImgbbData(
-    val url: String?
+    @SerializedName("url") val url: String?,
+    @SerializedName("display_url") val displayUrl: String? // Tambahan baru
 )

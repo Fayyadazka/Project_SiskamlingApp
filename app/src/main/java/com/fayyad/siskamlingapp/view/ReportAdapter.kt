@@ -9,53 +9,73 @@ import com.fayyad.siskamlingapp.data.ReportModel
 import com.fayyad.siskamlingapp.databinding.ItemReportBinding
 
 class ReportAdapter(
-    private val reportList: ArrayList<ReportModel>,
-    // Menambahkan detektor klik (callback)
-    private val onVerifyClick: (ReportModel) -> Unit,
-    private val onDeleteClick: (ReportModel) -> Unit
+    private val isRwMode: Boolean, // Mode RW atau Warga
+    private val onUpdateStatus: (ReportModel, String) -> Unit,
+    private val onDelete: (ReportModel) -> Unit
 ) : RecyclerView.Adapter<ReportAdapter.ReportViewHolder>() {
 
-    class ReportViewHolder(val binding: ItemReportBinding) : RecyclerView.ViewHolder(binding.root)
+    private val reports = mutableListOf<ReportModel>()
+
+    fun submitList(newList: List<ReportModel>) {
+        reports.clear()
+        reports.addAll(newList)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportViewHolder {
-        val binding = ItemReportBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemReportBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
         return ReportViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ReportViewHolder, position: Int) {
-        val report = reportList[position]
-
-        holder.binding.tvTitikRawan.text = report.titikRawan
-        holder.binding.tvKategori.text = "Kategori: ${report.kategoriKejadian}"
-        holder.binding.tvJadwal.text = "Jadwal Ronda: ${report.jadwalRonda}"
-        holder.binding.chipStatus.text = report.statusVerifikasiRw
-
-        // Mengatur tampilan berdasarkan status
-        if (report.statusVerifikasiRw == "Telah Diverifikasi") {
-            holder.binding.chipStatus.setChipBackgroundColorResource(android.R.color.holo_green_dark)
-            holder.binding.btnVerify.visibility = View.GONE // Sembunyikan tombol jika sudah diverifikasi
-        } else {
-            holder.binding.chipStatus.setChipBackgroundColorResource(android.R.color.holo_orange_dark)
-            holder.binding.btnVerify.visibility = View.VISIBLE
-        }
-
-        if (report.fotoKejadian.isNotEmpty()) {
-            holder.binding.ivFotoKejadian.visibility = View.VISIBLE
-            Glide.with(holder.itemView.context).load(report.fotoKejadian).centerCrop().into(holder.binding.ivFotoKejadian)
-        } else {
-            holder.binding.ivFotoKejadian.visibility = View.GONE
-        }
-
-        // Aksi saat tombol ditekan
-        holder.binding.btnVerify.setOnClickListener { onVerifyClick(report) }
-        holder.binding.btnDelete.setOnClickListener { onDeleteClick(report) }
+        holder.bind(reports[position])
     }
 
-    override fun getItemCount(): Int = reportList.size
+    override fun getItemCount(): Int = reports.size
 
-    fun updateData(newList: List<ReportModel>) {
-        reportList.clear()
-        reportList.addAll(newList)
-        notifyDataSetChanged()
+    inner class ReportViewHolder(private val binding: ItemReportBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(report: ReportModel) {
+            binding.tvTitikRawan.text = report.titikRawan
+            binding.tvKategori.text = "Kategori: ${report.kategoriKejadian}"
+            binding.tvJadwal.text = "Jadwal Ronda: ${report.jadwalRonda}"
+            binding.chipStatus.text = report.statusVerifikasiRw
+
+            // Load Gambar
+            // Load Gambar
+            val imageUrl = report.fotoKejadian.trim()
+            if (imageUrl.isNotEmpty() && imageUrl.startsWith("http")) {
+                binding.ivFotoKejadian.visibility = View.VISIBLE
+                Glide.with(itemView.context)
+                    .load(imageUrl)
+                    .override(800, 600)
+                    .placeholder(android.R.drawable.stat_sys_download)
+                    .error(android.R.drawable.ic_dialog_alert)
+                    .into(binding.ivFotoKejadian)
+            } else {
+                binding.ivFotoKejadian.visibility = View.GONE
+            }
+
+            // --- LOGIKA ROLE WAKTU DIPANGGIL ---
+            if (isRwMode) {
+                // Jika Mode RW: Tampilkan Tombol Aksi
+                binding.btnVerify.visibility = View.VISIBLE
+                binding.btnDelete.visibility = View.VISIBLE
+
+                binding.btnVerify.setOnClickListener {
+                    onUpdateStatus(report, "Diverifikasi RW")
+                }
+                binding.btnDelete.setOnClickListener {
+                    onDelete(report)
+                }
+            } else {
+                // Jika Mode Warga: SEMBUNYIKAN Tombol Aksi Verifikasi & Hapus
+                binding.btnVerify.visibility = View.GONE
+                binding.btnDelete.visibility = View.GONE
+            }
+        }
     }
 }

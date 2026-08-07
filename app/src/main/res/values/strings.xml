@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">Siskamling App</string>
+    <string name="app_name">SiskamlingApp</string>
+    <string name="error_incomplete_data">Mohon lengkapi titik rawan, kategori, dan tanggal ronda!</string>
+    <string name="btn_loading">Mengunggah &amp; Mengirim...</string>
+    <string name="btn_submit_default">Kirim Laporan</string>
+    <string name="success_send_report">Laporan Kamtibmas berhasil dikirim!</string>
+    <string name="error_read_image">Gagal membaca file gambar dari galeri.</string>
+    <string name="error_upload_image">Gagal memuat naik gambar ke pelayan.</string>
 </resources>

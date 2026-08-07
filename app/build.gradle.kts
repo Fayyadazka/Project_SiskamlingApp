@@ -1,3 +1,11 @@
+import java.util.Properties
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.legacy.kapt)
@@ -17,10 +25,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Membaca API Key dari local.properties
+        buildConfigField("String", "IMGBB_API_KEY", localProperties.getProperty("IMGBB_API_KEY") ?: "\"\"")
     }
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true // Mengaktifkan BuildConfig
     }
 
     buildTypes {
@@ -55,6 +67,12 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.database)
     implementation(libs.firebase.storage)
+
+    // COROUTINES (TAMBAHAN BARU)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 
     // RETROFIT (API Gambar)
     implementation(libs.retrofit.core)

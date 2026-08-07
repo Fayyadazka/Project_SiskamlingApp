@@ -2,74 +2,91 @@ package com.fayyad.siskamlingapp.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.fayyad.siskamlingapp.data.ImgbbApi
-import com.fayyad.siskamlingapp.data.ImgbbResponse
 import com.fayyad.siskamlingapp.data.OpenDataApi
 import com.fayyad.siskamlingapp.data.ReportModel
+import com.fayyad.siskamlingapp.domain.IReportRepository
 import com.google.firebase.database.DatabaseReference
 import dagger.hilt.android.qualifiers.ApplicationContext
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ReportRepository @Inject constructor(
     private val dbReference: DatabaseReference,
     private val imgbbApi: ImgbbApi,
-    @ApplicationContext private val context: Context
-) {
-    fun uploadPhotoAndInsertReport(imageUri: Uri?, report: ReportModel, onResult: (Boolean, String) -> Unit) {
-        if (imageUri != null) {
-            val inputStream = context.contentResolver.openInputStream(imageUri)
-            val bytes = inputStream?.readBytes()
-            inputStream?.close()
+    @param:ApplicationContext private val context: Context
+) : IReportRepository {
 
-            if (bytes == null) {
-                onResult(false, "Gagal membaca file gambar dari galeri.")
-                return
-            }
+    override suspend fun uploadPhotoAndInsertReport(imageUri: Uri?, report: ReportModel): Result<String> {
+        return try {
 
-            val mediaType = MediaType.parse("image/*")
-            val requestFile = RequestBody.create(mediaType, bytes)
-            val body = MultipartBody.Part.createFormData("image", "kejadian.jpg", requestFile)
+            // 1. UPLOAD GAMBAR TERLEBIH DAHULU (JIKA ADA FOTO)
+            if (imageUri != null) {
+                Log.d("UPLOAD_DEBUG", "Mulai mengunggah gambar ke ImgBB...")
 
-            val apiKey = "9e5fdf46d8fd9c8e70392191f6de1e14"
+                val imageUrl = withContext(Dispatchers.IO) {
+                    val inputStream = context.contentResolver.openInputStream(imageUri)
+                    val bytes = inputStream?.readBytes()
+                    inputStream?.close()
 
-            imgbbApi.uploadImage(apiKey, body).enqueue(object : Callback<ImgbbResponse> {
-                override fun onResponse(call: Call<ImgbbResponse>, response: Response<ImgbbResponse>) {
-                    if (response.isSuccessful && response.body()?.data?.url != null) {
-                        val imageUrl = response.body()!!.data!!.url!!
-                        val reportWithImage = report.copy(fotoKejadian = imageUrl)
+                    if (bytes == null) throw Exception("Gagal membaca file gambar dari galeri HP.")
 
-                        insertReportToDatabase(reportWithImage, onResult)
+                    // Siapkan file gambar
+                    val mediaType = okhttp3.MediaType.parse("image/*")
+                    val requestFile = okhttp3.RequestBody.create(mediaType, bytes)
+                    val body = okhttp3.MultipartBody.Part.createFormData("image", "kejadian.jpg", requestFile)
+
+                    // Hardcode API Key sementara agar terjamin 100% terbaca
+                    val apiKey = "9e5fdf46d8fd9c8e70392191f6de1e14"
+
+                    // Proses Upload ke Server
+                    val response = imgbbApi.uploadImage(apiKey, body)
+
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        val imgData = response.body()!!.data!!
+                        // Prioritaskan displayUrl (link gambar langsung), jika kosong baru pakai url biasa
+                        val urlSukses = imgData.displayUrl ?: imgData.url ?: ""
+                        Log.d("UPLOAD_DEBUG", "Upload Berhasil! Link Gambar: $urlSukses")
+                        urlSukses // Kembalikan URL
                     } else {
-                        onResult(false, "Gagal mendapatkan respons dari server gambar.")
+                        val pesanError = response.errorBody()?.string() ?: response.message()
+                        Log.e("UPLOAD_DEBUG", "ImgBB Menolak: $pesanError")
+                        throw Exception("Gagal Upload: API ImgBB menolak gambar ini.")
                     }
                 }
 
-                override fun onFailure(call: Call<ImgbbResponse>, t: Throwable) {
-                    onResult(false, "Koneksi ke server gambar terputus: ${t.message}")
-                }
-            })
-        } else {
-            insertReportToDatabase(report, onResult)
+                // KUNCI PERBAIKAN: Masukkan URL langsung ke variabel fotoKejadian tanpa .copy()
+                report.fotoKejadian = imageUrl
+
+            } else {
+                Log.d("UPLOAD_DEBUG", "Tidak ada gambar yang dipilih. Mengirim teks saja.")
+            }
+
+            // 2. SIMPAN KE FIREBASE
+            Log.d("UPLOAD_DEBUG", "Menyimpan seluruh data ke Firebase...")
+            val newRef = dbReference.push()
+            report.id = newRef.key ?: ""
+
+            // Proses Simpan Instan (Tanpa await)
+            newRef.setValue(report)
+            Log.d("UPLOAD_DEBUG", "Selesai menyimpan ke Firebase!")
+
+            Result.success("Laporan Kamtibmas berhasil dikirim!")
+
+        } catch (e: java.net.SocketTimeoutException) {
+            Log.e("UPLOAD_DEBUG", "Waktu Habis/Timeout!")
+            Result.failure(Exception("Waktu habis! Ukuran foto terlalu besar atau koneksi lambat."))
+        } catch (e: Exception) {
+            Log.e("UPLOAD_DEBUG", "Error Fatal: ${e.message}")
+            Result.failure(Exception("Gagal: ${e.message}"))
         }
     }
 
-    private fun insertReportToDatabase(report: ReportModel, onResult: (Boolean, String) -> Unit) {
-        val newRef = dbReference.push()
-        val reportWithId = report.copy(id = newRef.key ?: "")
-
-        newRef.setValue(reportWithId)
-            .addOnSuccessListener { onResult(true, "Laporan Kamtibmas berhasil dikirim!") }
-            .addOnFailureListener { exception -> onResult(false, exception.message ?: "Terjadi kesalahan sistem.") }
-    }
-    // Fungsi untuk menarik data dari Realtime Database secara Real-time
-    fun getReports(onResult: (List<ReportModel>, String?) -> Unit) {
-        // Menggunakan addValueEventListener agar setiap ada laporan baru, UI otomatis ter-update
+    override fun getReports(onResult: (List<ReportModel>, String?) -> Unit) {
         dbReference.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
                 val reportList = mutableListOf<ReportModel>()
@@ -79,60 +96,57 @@ class ReportRepository @Inject constructor(
                         reportList.add(report)
                     }
                 }
-                // Membalikkan urutan agar laporan terbaru ada di paling atas
                 reportList.reverse()
                 onResult(reportList, null)
             }
-
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
                 onResult(emptyList(), error.message)
             }
         })
     }
-    // Fungsi UPDATE: Mengubah Status Verifikasi
-    fun updateVerifikasiStatus(id: String, newStatus: String, onResult: (Boolean, String) -> Unit) {
+
+    override fun updateVerifikasiStatus(id: String, newStatus: String, onResult: (Boolean, String) -> Unit) {
         dbReference.child(id).child("statusVerifikasiRw").setValue(newStatus)
             .addOnSuccessListener { onResult(true, "Status berhasil diupdate!") }
             .addOnFailureListener { onResult(false, it.message ?: "Gagal mengupdate status") }
     }
 
-    // Fungsi DELETE: Menghapus Laporan
-    fun deleteReport(id: String, onResult: (Boolean, String) -> Unit) {
+    override fun deleteReport(id: String, onResult: (Boolean, String) -> Unit) {
         dbReference.child(id).removeValue()
             .addOnSuccessListener { onResult(true, "Laporan berhasil dihapus!") }
             .addOnFailureListener { onResult(false, it.message ?: "Gagal menghapus laporan") }
     }
-    // Menarik Data dari API Eksternal lalu Push ke Firebase
-    fun syncDataFromApi(apiUrl: String, onResult: (Boolean, String) -> Unit) {
-        val retrofit = retrofit2.Retrofit.Builder()
-            .baseUrl("https://run.mocky.io/")
-            .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
-            .build()
 
+    override fun syncDataFromApi(apiUrl: String, onResult: (Boolean, String) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val retrofit = retrofit2.Retrofit.Builder()
+                    .baseUrl("https://gist.githubusercontent.com/")
+                    .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
+                    .build()
+                val api = retrofit.create(OpenDataApi::class.java)
 
-        val api = retrofit.create(OpenDataApi::class.java)
-
-        api.getInitialData(apiUrl).enqueue(object : retrofit2.Callback<List<ReportModel>> {
-            override fun onResponse(call: retrofit2.Call<List<ReportModel>>, response: retrofit2.Response<List<ReportModel>>) {
+                val response = api.getInitialData(apiUrl)
                 if (response.isSuccessful && response.body() != null) {
                     val listData = response.body()!!
-
-                    // Looping data dari API dan masukkan ke Firebase
                     for (report in listData) {
                         val newId = dbReference.push().key ?: continue
-                        report.id = newId // Berikan ID unik Firebase
+                        report.id = newId
                         dbReference.child(newId).setValue(report)
                     }
-                    onResult(true, "Berhasil! ${listData.size} Data Awal API disinkronisasi ke Firebase.")
+                    withContext(Dispatchers.Main) {
+                        onResult(true, "Berhasil! ${listData.size} Data tersinkronisasi.")
+                    }
                 } else {
-                    onResult(false, "Gagal mengambil data dari Server API.")
+                    withContext(Dispatchers.Main) {
+                        onResult(false, "Gagal mengambil data dari Server API.")
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    onResult(false, "Error Jaringan: ${e.message}")
                 }
             }
-
-            override fun onFailure(call: retrofit2.Call<List<ReportModel>>, t: Throwable) {
-                onResult(false, "Error Jaringan: ${t.message}")
-            }
-        })
+        }
     }
-
 }

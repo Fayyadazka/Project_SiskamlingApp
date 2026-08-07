@@ -4,184 +4,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F4F6F8">
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#F8F9FA">
 
-    <!-- Header Navy Blue (Sesuai Logo) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:orientation="vertical"
-        android:background="#0D3B66"
-        android:padding="24dp"
-        android:gravity="center_vertical"
-        android:elevation="4dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Selamat Datang,"
-            android:textColor="#B0C4DE"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pengurus RW &amp; Warga"
-            android:textColor="#FFFFFF"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:layout_marginTop="4dp"/>
-    </LinearLayout>
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/logo"
+        android:layout_marginBottom="24dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Layanan Cepat"
-        android:textColor="#0D3B66"
-        android:textSize="18sp"
+        android:text="SiskamlingApp"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="24dp"
+        android:textColor="#212121"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sistem Laporan Keamanan Warga"
+        android:textSize="14sp"
+        android:textColor="#757575"
+        android:layout_marginBottom="40dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLaporKejadian"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Lapor Kejadian"
+        app:cornerRadius="12dp"
+        app:icon="@android:drawable/ic_menu_edit"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Grid Menu Modern -->
-    <GridLayout
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLihatLaporan"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Lihat Daftar Laporan"
+        app:cornerRadius="12dp"
+        app:icon="@android:drawable/ic_menu_view"
+        android:layout_marginBottom="24dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="16dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnVerifikasiRw"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:paddingHorizontal="16dp"
-        android:alignmentMode="alignMargins"
-        android:columnOrderPreserved="false">
-
-        <!-- Menu 1: Lapor -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardLapor"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_margin="8dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp"
-            android:clickable="true"
-            android:focusable="true">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="32dp">
-
-                <!-- Icon Orange (Sesuai teks "App" di logo) -->
-                <ImageView
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:src="@android:drawable/ic_menu_edit"
-                    app:tint="#F28C28"
-                    android:background="@drawable/bg_circle_orange_light"
-                    android:padding="12dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Lapor\nKejadian"
-                    android:textAlignment="center"
-                    android:textColor="#0D3B66"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Menu 2: Daftar -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardDaftar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_margin="8dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp"
-            android:clickable="true"
-            android:focusable="true">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="32dp">
-
-                <ImageView
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:src="@android:drawable/ic_menu_agenda"
-                    app:tint="#0D3B66" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Daftar\nLaporan"
-                    android:textAlignment="center"
-                    android:textColor="#0D3B66"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-        <!-- Menu 3: Sinkronisasi API (Membentang 2 Kolom) -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardSyncApi"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_columnSpan="2"
-            android:layout_margin="8dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp"
-            android:clickable="true"
-            android:focusable="true">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="24dp"
-                android:background="#E3F2FD"> <!-- Biru Muda -->
-
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@android:drawable/ic_popup_sync"
-                    app:tint="#0D3B66" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginStart="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sinkronisasi Data Awal"
-                        android:textColor="#0D3B66"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tarik data dari Open Data API Pemerintah"
-                        android:textColor="#546E7A"
-                        android:textSize="12sp"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-    </GridLayout>
+        android:text="Masuk sebagai Pengurus RW"
+        android:textStyle="bold"
+        android:textColor="#D32F2F" />
 
 </LinearLayout>

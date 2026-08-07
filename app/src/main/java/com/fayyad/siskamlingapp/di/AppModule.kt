@@ -17,11 +17,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseDatabase(): DatabaseReference {
-        return FirebaseDatabase.getInstance().getReference("laporan_kamtibmas")
+    fun provideFirebaseDatabaseRef(): DatabaseReference {
+        // Memasukkan URL Realtime Database secara spesifik untuk region Singapore
+        val databaseUrl = "https://uas-android-bf922-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        return FirebaseDatabase.getInstance(databaseUrl).reference.child("reports")
     }
 
-    // Mesin baru pengunggah foto menggunakan Retrofit
     @Provides
     @Singleton
     fun provideImgbbApi(): ImgbbApi {

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#F8F9FA">
 
-    <!-- Header / Toolbar Sederhana -->
     <LinearLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#B71C1C"
@@ -15,6 +14,7 @@
         android:elevation="4dp">
 
         <TextView
+            android:id="@+id/tvHeaderTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Daftar Laporan Warga"
@@ -23,11 +23,12 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Kolom Pencarian -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/searchContainer"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/headerLayout"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
         app:boxCornerRadiusTopStart="24dp"
@@ -44,18 +45,17 @@
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Pembungkus Swipe to Refresh -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/searchContainer"
         android:layout_marginTop="8dp">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- Daftar Laporan -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvReports"
                 android:layout_width="match_parent"
@@ -63,7 +63,6 @@
                 android:clipToPadding="false"
                 android:paddingVertical="8dp" />
 
-            <!-- Empty State (Tampil jika data kosong) -->
             <LinearLayout
                 android:id="@+id/layoutEmptyState"
                 android:layout_width="match_parent"
@@ -73,32 +72,33 @@
                 android:visibility="gone">
 
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@android:drawable/ic_menu_search"
-                    app:tint="#E0E0E0" />
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@android:drawable/ic_dialog_info"
+                    app:tint="#BDBDBD" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Data laporan tidak ditemukan"
-                    android:textColor="#9E9E9E"
-                    android:textSize="16sp" />
+                    android:text="Belum ada data laporan."
+                    android:textColor="#757575"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Tombol Cetak PDF -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/btnCetakPdf"
+        android:id="@+id/btnSyncApi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="16dp"
-        android:text="Cetak PDF"
-        app:icon="@android:drawable/ic_menu_save"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="24dp"
+        android:text="Sync Data API"
+        app:icon="@android:drawable/ic_popup_sync"
         android:textColor="#FFFFFF"
-        android:backgroundTint="#D32F2F"/>
+        android:backgroundTint="#1976D2"/>
 
-</LinearLayout>
+</RelativeLayout>
